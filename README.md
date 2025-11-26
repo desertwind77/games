@@ -11,8 +11,8 @@ Games implemented with a shared minimax engine.
 - Search: `--max-depth` caps minimax depth (default 3).
 - Board: human moves shown in red; latest computer move highlighted yellow.
 
-## Four in a Row
-- Play: `python four_in_a_row.py [--human-first] [--max-depth N]`
+## Connect Four
+- Play: `python connect_four.py [--human-first] [--max-depth N]`
 - Turn order: default random; use `--human-first` to force human start.
 - Search: `--max-depth` caps minimax depth (default 3).
 - Board: human moves in red; latest computer move highlighted yellow.

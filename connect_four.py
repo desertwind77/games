@@ -7,7 +7,7 @@ from typing import Optional
 from gamelib.minimax import Minimax, CellType, Winner
 
 
-class Board(Minimax):
+class ConnectFour(Minimax):
     def __init__(self, row: int = 6, col: int = 7, max_depth: int = 3):
         super().__init__(row, col)
         self.row = row
@@ -193,7 +193,7 @@ def main():
                         help='Force the human to play first (default: random)')
     args = parser.parse_args()
 
-    board = Board(max_depth=args.max_depth)
+    board = ConnectFour(max_depth=args.max_depth)
     board.play(human_first=args.human_first if args.human_first else None)
 
 
