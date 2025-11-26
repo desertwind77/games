@@ -4,6 +4,7 @@ Games can subclass `Minimax` and provide board-specific winner detection and
 rendering helpers while reusing the core search routine.
 '''
 from enum import Enum
+from typing import Optional
 import math
 
 # pylint: disable=import-error
@@ -31,7 +32,8 @@ class Minimax:
         self.col = col
         self.board = np.full((self.row, self.col), CellType.EMPTY)
 
-    def minimax(self, depth: int, is_maximizing: bool, alpha: float = -math.inf, beta: float = math.inf) -> float:
+    def minimax(self, depth: int, is_maximizing: bool, alpha: float = -math.inf,
+                beta: float = math.inf, max_depth: Optional[int] = None) -> float:
         '''An implementation of the Minimax algorithm with alpha-beta pruning
 
         Arguments:
@@ -42,6 +44,8 @@ class Minimax:
             is_maximizing (bool): operating as a maximizer or a minimizer
             alpha (float): best already explored option along the path to the root for maximizer
             beta (float): best already explored option along the path to the root for minimizer
+            max_depth (Optional[int]): optional depth limit to cap search for
+                                        large branching games
 
         Returns:
             (int) the score of this path. Scores are depth-weighted to favor
@@ -55,6 +59,9 @@ class Minimax:
                 return depth - 10
             return 10 - depth
 
+        if max_depth is not None and depth >= max_depth:
+            return 0
+
         if is_maximizing:
             best_score = -math.inf
             for row in range(self.row):
@@ -62,7 +69,7 @@ class Minimax:
                     if self.board[row, col] != CellType.EMPTY:
                         continue
                     self.board[row, col] = CellType.COMPUTER
-                    score = self.minimax(depth + 1, False, alpha, beta)
+                    score = self.minimax(depth + 1, False, alpha, beta, max_depth)
                     self.board[row, col] = CellType.EMPTY
 
                     best_score = max(best_score, score)
@@ -78,7 +85,7 @@ class Minimax:
                         continue
                     self.board[row, col] = CellType.HUMAN
 
-                    score = self.minimax(depth + 1, True, alpha, beta)
+                    score = self.minimax(depth + 1, True, alpha, beta, max_depth)
                     best_score = min(best_score, score)
                     self.board[row, col] = CellType.EMPTY
                     beta = min(beta, best_score)

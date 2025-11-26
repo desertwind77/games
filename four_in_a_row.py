@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import math
+from typing import Optional
 
 from gamelib.minimax import Minimax, CellType, Winner
 
@@ -43,10 +45,17 @@ class Board(Minimax):
         Return:
             True if there is an empty cell in the column
         '''
-        for row in range(self.row):
+        return self.next_open_row(col) is not None
+
+
+    def next_open_row(self, col: int) -> Optional[int]:
+        '''Return the lowest open row index in a column, or None if full.'''
+        if col < 0 or col >= self.col:
+            return None
+        for row in reversed(range(self.row)):
             if self.is_cell_empty(row, col):
-                return True
-        return False
+                return row
+        return None
 
 
     def insert(self, player: CellType, col:int) -> None:
@@ -57,14 +66,30 @@ class Board(Minimax):
             player (Player): the player who inserts the chip
             col (int): the column to insert
         '''
-        for row in range(self.row):
-            if self.is_cell_empty(row, col):
-                if row == self.row - 1:
-                    # The last row
-                    self.board[row, col] = player
-                else:
-                    if not self.is_cell_empty(row + 1, col):
-                        self.board[row, col] = player
+        if (row := self.next_open_row(col)) is not None:
+            self.board[row, col] = player
+
+
+    def best_move(self, max_depth: int = 4) -> None:
+        '''Choose the best move for the computer using depth-limited minimax.'''
+        best_score = -math.inf
+        best_col = None
+
+        for col in range(self.col):
+            if (row := self.next_open_row(col)) is None:
+                continue
+            self.board[row, col] = CellType.COMPUTER
+            score = self.minimax(0, False, max_depth=max_depth)
+            self.board[row, col] = CellType.EMPTY
+
+            if score > best_score:
+                best_score = score
+                best_col = col
+
+        if best_col is not None:
+            drop_row = self.next_open_row(best_col)
+            if drop_row is not None:
+                self.board[drop_row, best_col] = CellType.COMPUTER
 
 
     def check_winner(self) -> Winner:
@@ -115,24 +140,31 @@ class Board(Minimax):
 
         player = CellType.HUMAN
         while True:
-            input_str = input("Enter the column number or 'q' to quit: ").strip()
-            if input_str == 'q':
-                return
+            if player == CellType.HUMAN:
+                input_str = input("Enter the column number or 'q' to quit: ").strip()
+                if input_str == 'q':
+                    return
 
-            try:
-                col = int(input_str)
-            except ValueError:
-                continue
-            if not self.has_empty_cell(col):
-                continue
+                try:
+                    col = int(input_str)
+                except ValueError:
+                    continue
 
-            self.insert(player, col)
-            player = CellType.COMPUTER if player == CellType.HUMAN else CellType.HUMAN
+                if not self.has_empty_cell(col):
+                    continue
+
+                self.insert(player, col)
+            else:
+                print("Computer's turn\n")
+                self.best_move()
+
             self.show_board()
 
             winner = self.check_winner()
             if winner == Winner.NONE:
+                player = CellType.COMPUTER if player == CellType.HUMAN else CellType.HUMAN
                 continue
+
             message_dict = {
                 Winner.TIE: 'Tie!',
                 Winner.HUMAN: 'You won!',
