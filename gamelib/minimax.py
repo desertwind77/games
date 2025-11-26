@@ -39,15 +39,16 @@ class Minimax:
             is_maximizing (bool): operating as a maximizer or a minimizer
 
         Returns:
-            (int) the score of this path. -1 and 1 for losing and winning outcomes
-            respectively
+            (int) the score of this path. Scores are depth-weighted to favor
+            faster wins and slower losses: positive for computer wins, negative
+            for human wins, and 0 for ties.
         '''
         if (winner := self.check_winner()) != Winner.NONE:
             if winner == Winner.TIE:
                 return 0
             if winner == Winner.HUMAN:
-                return -1
-            return 1
+                return depth - 10
+            return 10 - depth
 
         if is_maximizing:
             best_score = -math.inf
