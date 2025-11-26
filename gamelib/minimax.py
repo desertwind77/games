@@ -26,17 +26,17 @@ class Minimax:
         self.col = col
         self.board = np.full((self.row, self.col), CellType.EMPTY)
 
-    def minimax(self, depth: int, is_maximizing: bool) -> float:
-        '''An implementation of the Minimax algorithm
+    def minimax(self, depth: int, is_maximizing: bool, alpha: float = -math.inf, beta: float = math.inf) -> float:
+        '''An implementation of the Minimax algorithm with alpha-beta pruning
 
         Arguments:
-            depth (int): the current depth in the decision tree. We don't use
-                         this here because the decision of the tree for Tic Tac
-                         Toe is not that deep. For some other games, we may need
-                         to limit the depth that the algorithm can go to yield
-                         reasonable response time
+            depth (int): the current depth in the decision tree; used for
+                         depth-weighted scoring and can be used to bound search
+                         for deeper games to keep response times reasonable
 
             is_maximizing (bool): operating as a maximizer or a minimizer
+            alpha (float): best already explored option along the path to the root for maximizer
+            beta (float): best already explored option along the path to the root for minimizer
 
         Returns:
             (int) the score of this path. Scores are depth-weighted to favor
@@ -57,9 +57,13 @@ class Minimax:
                     if self.board[row, col] != CellType.EMPTY:
                         continue
                     self.board[row, col] = CellType.COMPUTER
-                    score = self.minimax(depth + 1, False)
-                    best_score = max(best_score, score)
+                    score = self.minimax(depth + 1, False, alpha, beta)
                     self.board[row, col] = CellType.EMPTY
+
+                    best_score = max(best_score, score)
+                    alpha = max(alpha, best_score)
+                    if beta <= alpha:
+                        return best_score
         else:
             best_score = math.inf
             for row in range(self.row):
@@ -67,9 +71,13 @@ class Minimax:
                     if self.board[row, col] != CellType.EMPTY:
                         continue
                     self.board[row, col] = CellType.HUMAN
-                    score = self.minimax(depth + 1, True)
+
+                    score = self.minimax(depth + 1, True, alpha, beta)
                     best_score = min(best_score, score)
                     self.board[row, col] = CellType.EMPTY
+                    beta = min(beta, best_score)
+                    if beta <= alpha:
+                        return best_score
         return best_score
 
     def check_winner(self) -> Winner:
