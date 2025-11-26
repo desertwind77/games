@@ -77,6 +77,10 @@ class TicTacToe(Minimax):
     def best_move(self) -> None:
         '''For the computer to choose his next best move, one with the
         highest score according to the minimax algorithm'''
+        if (self.board == CellType.EMPTY).all():
+            # First move: choose randomly to avoid deterministic openings.
+            return self.random_move()
+
         best_score = -math.inf
         move_row = move_col = None
         for row in range(self.size):

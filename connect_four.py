@@ -79,6 +79,14 @@ class ConnectFour(Minimax):
 
     def best_move(self) -> None:
         '''Choose the best move for the computer using depth-limited minimax.'''
+        if all(self.is_cell_empty(r, c) for r in range(self.row) for c in range(self.col)):
+            # Empty board: pick a random legal column to vary openings.
+            open_cols = [c for c in range(self.col) if self.has_empty_cell(c)]
+            if open_cols:
+                rand_col = random.choice(open_cols)
+                self.insert(CellType.COMPUTER, rand_col)
+            return
+
         best_score = -math.inf
         best_col = None
 
