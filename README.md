@@ -16,3 +16,9 @@ Games implemented with a shared minimax engine.
 - Turn order: default random; use `--human-first` to force human start.
 - Search: `--max-depth` caps minimax depth (default 3).
 - Board: human moves in red; latest computer move highlighted yellow.
+
+## Future Works
+- Gomoku (five-in-a-row) on a small board: same grid logic, just change the win-length and add a heuristic + depth limit for larger boards.
+- Reversi/Othello: manageable branching with alpha–beta; you’d add a flanking/capture move generator and a disk-difference/positional heuristic.
+- Checkers (small variant): larger branching, but still feasible with a tighter depth cap and a piece-count/king-weighted heuristic.
+- Quarto (4×4): low branching; each move both places a piece and hands a piece to the opponent—minimax handles the dual-choice turn structure well.   
