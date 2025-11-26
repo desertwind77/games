@@ -4,6 +4,7 @@ A script to play Tic Tac Toe against the computer.
 This script demonstrates the Minimax algorithm.
 '''
 import argparse
+import math
 import random
 import uuid
 import sys
@@ -74,7 +75,7 @@ class TicTacToe(Minimax):
     def best_move(self) -> None:
         '''For the computer to choose his next best move, one with the
         highest score according to the minimax algorithm'''
-        best_score = -10
+        best_score = -math.inf
         move_row = move_col = None
         for row in range(self.size):
             for col in range(self.size):
@@ -116,10 +117,10 @@ class TicTacToe(Minimax):
                 input_str = input("Enter row and col (e.g. 1 2) or q to quit: ").strip()
                 if input_str == 'q':
                     sys.exit(0)
-                row, col = input_str.split(' ')
-                row, col = int(row), int(col)
+                row_str, col_str = input_str.split(' ')
+                row, col = int(row_str), int(col_str)
             except ValueError:
-                pass
+                continue
             if (row >= self.size or col >= self.size) or \
                     self.board[row, col] != CellType.EMPTY:
                 continue
@@ -147,7 +148,7 @@ class TicTacToe(Minimax):
             human_first (bool): the first move is for the human or machine
         '''
         count = 0
-        human = human_first if human_first else self.coin_toss()
+        human = human_first
 
         if human:
             self.show_board()
