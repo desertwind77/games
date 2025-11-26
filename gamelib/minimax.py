@@ -1,0 +1,90 @@
+'''
+This module contains the minimax algorithm.
+'''
+from enum import Enum
+import math
+
+# pylint: disable=import-error
+import numpy as np
+
+
+class CellType(Enum):
+    EMPTY = 0
+    HUMAN = 1
+    COMPUTER = 2
+
+class Winner(Enum):
+    NONE = 0
+    TIE = 1
+    HUMAN = 2
+    COMPUTER = 3
+
+
+class Minimax:
+    def __init__(self, row, col):
+        self.row = row
+        self.col = col
+        self.board = np.full((self.row, self.col), CellType.EMPTY)
+
+    def minimax(self, depth: int, is_maximizing: bool) -> float:
+        '''An implementation of the Minimax algorithm
+
+        Arguments:
+            depth (int): the current depth in the decision tree. We don't use
+                         this here because the decision of the tree for Tic Tac
+                         Toe is not that deep. For some other games, we may need
+                         to limit the depth that the algorithm can go to yield
+                         reasonable response time
+
+            is_maximizing (bool): operating as a maximizer or a minimizer
+
+        Returns:
+            (int) the score of this path. -1 and 1 for losing and winning outcomes
+            respectively
+        '''
+        if (winner := self.check_winner()) != Winner.NONE:
+            if winner == Winner.TIE:
+                return 0
+            if winner == Winner.HUMAN:
+                return -1
+            return 1
+
+        if is_maximizing:
+            best_score = -math.inf
+            for row in range(self.row):
+                for col in range(self.col):
+                    if self.board[row, col] != CellType.EMPTY:
+                        continue
+                    self.board[row, col] = CellType.COMPUTER
+                    score = self.minimax(depth + 1, False)
+                    best_score = max(best_score, score)
+                    self.board[row, col] = CellType.EMPTY
+        else:
+            best_score = math.inf
+            for row in range(self.row):
+                for col in range(self.col):
+                    if self.board[row, col] != CellType.EMPTY:
+                        continue
+                    self.board[row, col] = CellType.HUMAN
+                    score = self.minimax(depth + 1, True)
+                    best_score = min(best_score, score)
+                    self.board[row, col] = CellType.EMPTY
+        return best_score
+
+    def check_winner(self) -> Winner:
+        '''Check who is the winner'''
+        raise NotImplementedError
+
+    def cell_char(self, cell_type: CellType) -> str:
+        raise NotImplementedError
+
+    def show_board(self):
+        '''Draw the board on the console screen'''
+        col = [str(i) for i in range(self.col)]
+        col_str = '    ' + '   '.join(col)
+        print(col_str)
+        for row in range(self.row):
+            cells = [self.cell_char(i) for i in self.board[row]]
+            content = f'{row} | ' + ' | '.join(cells) + ' |'
+            print(content)
+        print()
