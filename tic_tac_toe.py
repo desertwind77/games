@@ -90,6 +90,7 @@ class TicTacToe(Minimax):
                     best_score = score
                     move_row, move_col = row, col
         self.board[move_row, move_col] = CellType.COMPUTER
+        self.last_computer_move = (move_row, move_col)
 
     def random_move(self) -> None:
         '''Choose an empty cell randomly'''
@@ -100,6 +101,7 @@ class TicTacToe(Minimax):
                     empty_cells.append((row, col))
         r, c = random.choice(empty_cells)
         self.board[r][c] = CellType.COMPUTER
+        self.last_computer_move = (r, c)
 
     def coin_toss(self) -> bool:
         '''Toss a coin
@@ -127,6 +129,7 @@ class TicTacToe(Minimax):
                     self.board[row, col] != CellType.EMPTY:
                 continue
             self.board[row, col] = CellType.HUMAN
+            self.last_human_move = (row, col)
             break
 
     def make_computer_move(self, difficulty: int) -> None:

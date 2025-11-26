@@ -4,7 +4,7 @@ Games can subclass `Minimax` and provide board-specific winner detection and
 rendering helpers while reusing the core search routine.
 '''
 from enum import Enum
-from typing import Optional
+from typing import Optional, Tuple
 import math
 
 # pylint: disable=import-error
@@ -31,6 +31,8 @@ class Minimax:
         self.row = row
         self.col = col
         self.board = np.full((self.row, self.col), CellType.EMPTY)
+        self.last_human_move: Optional[Tuple[int, int]] = None
+        self.last_computer_move: Optional[Tuple[int, int]] = None
 
     def minimax(self, depth: int, is_maximizing: bool, alpha: float = -math.inf,
                 beta: float = math.inf, max_depth: Optional[int] = None) -> float:
@@ -109,7 +111,18 @@ class Minimax:
         col_str = '    ' + '   '.join(col)
         print(col_str)
         for row in range(self.row):
-            cells = [self.cell_char(i) for i in self.board[row]]
+            cells = []
+            for col in range(self.col):
+                cell_value = self.board[row, col]
+                display = self.cell_char(cell_value)
+                if cell_value == CellType.HUMAN:
+                    if self.last_human_move == (row, col):
+                        display = f'\033[31m{display}\033[0m'
+                elif cell_value == CellType.COMPUTER:
+                    # Always render computer pieces in yellow; bold the latest move.
+                    color_code = '1;33' if self.last_computer_move == (row, col) else '33'
+                    display = f'\033[{color_code}m{display}\033[0m'
+                cells.append(display)
             content = f'{row} | ' + ' | '.join(cells) + ' |'
             print(content)
         print()

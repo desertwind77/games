@@ -68,6 +68,10 @@ class Board(Minimax):
         '''
         if (row := self.next_open_row(col)) is not None:
             self.board[row, col] = player
+            if player == CellType.HUMAN:
+                self.last_human_move = (row, col)
+            else:
+                self.last_computer_move = (row, col)
 
 
     def best_move(self, max_depth: int = 4) -> None:
@@ -90,6 +94,7 @@ class Board(Minimax):
             drop_row = self.next_open_row(best_col)
             if drop_row is not None:
                 self.board[drop_row, best_col] = CellType.COMPUTER
+                self.last_computer_move = (drop_row, best_col)
 
 
     def check_winner(self) -> Winner:
