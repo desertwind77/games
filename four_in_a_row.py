@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import math
 from typing import Optional
 
@@ -6,10 +7,11 @@ from gamelib.minimax import Minimax, CellType, Winner
 
 
 class Board(Minimax):
-    def __init__(self, row: int = 6, col: int = 7):
+    def __init__(self, row: int = 6, col: int = 7, max_depth: int = 3):
         super().__init__(row, col)
         self.row = row
         self.col = col
+        self.max_depth = max_depth
 
 
     def cell_char(self, cell_type: CellType) -> str:
@@ -74,7 +76,7 @@ class Board(Minimax):
                 self.last_computer_move = (row, col)
 
 
-    def best_move(self, max_depth: int = 4) -> None:
+    def best_move(self) -> None:
         '''Choose the best move for the computer using depth-limited minimax.'''
         best_score = -math.inf
         best_col = None
@@ -83,7 +85,7 @@ class Board(Minimax):
             if (row := self.next_open_row(col)) is None:
                 continue
             self.board[row, col] = CellType.COMPUTER
-            score = self.minimax(0, False, max_depth=max_depth)
+            score = self.minimax(0, False, max_depth=self.max_depth)
             self.board[row, col] = CellType.EMPTY
 
             if score > best_score:
@@ -180,7 +182,12 @@ class Board(Minimax):
 
 
 def main():
-    board = Board()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-m', '--max-depth', type=int, default=3,
+                        help='Max search depth for minimax (default: 3)')
+    args = parser.parse_args()
+
+    board = Board(max_depth=args.max_depth)
     board.play()
 
 

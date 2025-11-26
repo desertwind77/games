@@ -14,7 +14,7 @@ from gamelib.minimax import Minimax, CellType, Winner
 
 class TicTacToe(Minimax):
     '''The classic Tic Tac Toe board game built on the Minimax engine.'''
-    def __init__(self, size: int = 3) -> None:
+    def __init__(self, size: int = 3, max_depth: int = 3) -> None:
         '''Constructor
 
         Args:
@@ -22,6 +22,7 @@ class TicTacToe(Minimax):
         '''
         super().__init__(size, size)
         self.size = size
+        self.max_depth = max_depth
 
     def cell_char(self, cell_type: CellType) -> str:
         '''Render a cell value into a printable character.'''
@@ -83,7 +84,7 @@ class TicTacToe(Minimax):
                 if self.board[row, col] != CellType.EMPTY:
                     continue
                 self.board[row, col] = CellType.COMPUTER
-                score = self.minimax(0, False)
+                score = self.minimax(0, False, max_depth=self.max_depth)
                 self.board[row, col] = CellType.EMPTY
 
                 if score >= best_score:
@@ -193,13 +194,15 @@ def process_arguments() -> argparse.Namespace:
                         help='Choose the difficulty level')
     parser.add_argument('-H', '--human-first', action='store_true', dest='human_first',
                         help='Let the human play first')
+    parser.add_argument('-m', '--max-depth', type=int, default=3,
+                        help='Max search depth for minimax (default: 3)')
     return parser.parse_args()
 
 
 def main():
     '''The main program'''
     args = process_arguments()
-    game = TicTacToe()
+    game = TicTacToe(max_depth=args.max_depth)
     difficulty = int(args.difficulty)
     game.play(difficulty=difficulty, human_first=args.human_first)
 
