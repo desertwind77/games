@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import math
+import random
 from typing import Optional
 
 from gamelib.minimax import Minimax, CellType, Winner
@@ -142,10 +143,13 @@ class Board(Minimax):
         return Winner.NONE
 
 
-    def play(self):
+    def play(self, human_first: Optional[bool] = None):
         self.show_board()
 
-        player = CellType.HUMAN
+        if human_first is None:
+            player = CellType.HUMAN if random.choice([True, False]) else CellType.COMPUTER
+        else:
+            player = CellType.HUMAN if human_first else CellType.COMPUTER
         while True:
             if player == CellType.HUMAN:
                 input_str = input("Enter the column number or 'q' to quit: ").strip()
@@ -185,10 +189,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-m', '--max-depth', type=int, default=3,
                         help='Max search depth for minimax (default: 3)')
+    parser.add_argument('-H', '--human-first', action='store_true', dest='human_first',
+                        help='Force the human to play first (default: random)')
     args = parser.parse_args()
 
     board = Board(max_depth=args.max_depth)
-    board.play()
+    board.play(human_first=args.human_first if args.human_first else None)
 
 
 if __name__ == '__main__':

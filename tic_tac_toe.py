@@ -147,18 +147,17 @@ class TicTacToe(Minimax):
         else:
             self.random_move()
 
-    def play(self, difficulty: int, human_first: bool = True) -> None:
+    def play(self, difficulty: int, human_first: bool | None = None) -> None:
         '''Play the game against the computer
 
         Args:
             difficulty (int): difficulty level
-            human_first (bool): the first move is for the human or machine
+            human_first (bool | None): True for human first, False for computer
+                                       first, None for random choice
         '''
         count = 0
-        human = human_first
-
-        if human:
-            self.show_board()
+        human = human_first if human_first is not None else random.choice([True, False])
+        self.show_board()
 
         while count < self.size * self.size:
             if human:
@@ -193,7 +192,7 @@ def process_arguments() -> argparse.Namespace:
                         choices=['1', '2', '3'], default='3',
                         help='Choose the difficulty level')
     parser.add_argument('-H', '--human-first', action='store_true', dest='human_first',
-                        help='Let the human play first')
+                        help='Force the human to play first (default: random)')
     parser.add_argument('-m', '--max-depth', type=int, default=3,
                         help='Max search depth for minimax (default: 3)')
     return parser.parse_args()
@@ -204,7 +203,7 @@ def main():
     args = process_arguments()
     game = TicTacToe(max_depth=args.max_depth)
     difficulty = int(args.difficulty)
-    game.play(difficulty=difficulty, human_first=args.human_first)
+    game.play(difficulty=difficulty, human_first=args.human_first if args.human_first else None)
 
 
 if __name__ == '__main__':
