@@ -13,7 +13,7 @@ from gamelib.minimax import Minimax, CellType, Winner
 
 
 class TicTacToe(Minimax):
-    '''The classic Tic Tac Toe board game'''
+    '''The classic Tic Tac Toe board game built on the Minimax engine.'''
     def __init__(self, size: int = 3) -> None:
         '''Constructor
 
@@ -24,6 +24,7 @@ class TicTacToe(Minimax):
         self.size = size
 
     def cell_char(self, cell_type: CellType) -> str:
+        '''Render a cell value into a printable character.'''
         cell_dict = {
             CellType.EMPTY: ' ',
             CellType.HUMAN: 'O',
@@ -37,7 +38,7 @@ class TicTacToe(Minimax):
         Returns:
             the winner
         '''
-        # horizontal
+        # Horizontal lines
         for row in range(self.size):
             values = set(self.board[row, i] for i in range(self.size))
             if len(values) == 1:
@@ -45,7 +46,7 @@ class TicTacToe(Minimax):
                     return Winner.HUMAN if winner == CellType.HUMAN \
                             else Winner.COMPUTER
 
-        # vertical
+        # Vertical lines
         for col in range(self.size):
             values = set(self.board[i, col] for i in range(self.size))
             if len(values) == 1:
@@ -53,7 +54,7 @@ class TicTacToe(Minimax):
                     return Winner.HUMAN if winner == CellType.HUMAN \
                             else Winner.COMPUTER
 
-        # diagonal
+        # Diagonals
         values = set(self.board[i, i] for i in range(self.size))
         if len(values) == 1:
             if (winner := values.pop()) != CellType.EMPTY:
@@ -112,6 +113,7 @@ class TicTacToe(Minimax):
         return int(gen_id[0]) >= 5
 
     def make_human_move(self) -> None:
+        '''Prompt for and place the human player's move.'''
         while True:
             try:
                 input_str = input("Enter row and col (e.g. 1 2) or q to quit: ").strip()
@@ -128,6 +130,7 @@ class TicTacToe(Minimax):
             break
 
     def make_computer_move(self, difficulty: int) -> None:
+        '''Select the computer's move using the requested difficulty profile.'''
         print("Machine's turn\n")
 
         if difficulty == 3:

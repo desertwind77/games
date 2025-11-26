@@ -1,5 +1,7 @@
-'''
-This module contains the minimax algorithm.
+'''Shared Minimax game engine with alpha-beta pruning.
+
+Games can subclass `Minimax` and provide board-specific winner detection and
+rendering helpers while reusing the core search routine.
 '''
 from enum import Enum
 import math
@@ -13,6 +15,7 @@ class CellType(Enum):
     HUMAN = 1
     COMPUTER = 2
 
+
 class Winner(Enum):
     NONE = 0
     TIE = 1
@@ -21,7 +24,9 @@ class Winner(Enum):
 
 
 class Minimax:
+    '''Base class for grid-based, two-player, perfect-information games.'''
     def __init__(self, row, col):
+        '''Initialize an empty board of the configured shape.'''
         self.row = row
         self.col = col
         self.board = np.full((self.row, self.col), CellType.EMPTY)
@@ -63,6 +68,7 @@ class Minimax:
                     best_score = max(best_score, score)
                     alpha = max(alpha, best_score)
                     if beta <= alpha:
+                        # Beta cut-off: opponent already has a better option.
                         return best_score
         else:
             best_score = math.inf
@@ -77,6 +83,8 @@ class Minimax:
                     self.board[row, col] = CellType.EMPTY
                     beta = min(beta, best_score)
                     if beta <= alpha:
+                        # Alpha cut-off: maximizing player found a path that
+                        # avoids this subtree.
                         return best_score
         return best_score
 
@@ -85,6 +93,7 @@ class Minimax:
         raise NotImplementedError
 
     def cell_char(self, cell_type: CellType) -> str:
+        '''Translate a cell enum into a display character.'''
         raise NotImplementedError
 
     def show_board(self):
